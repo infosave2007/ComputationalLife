@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "complife"
+version = "0.2.0"
+description = "A computational theory of life and mind: self-reference, self-modeling, self-replication and physical limits, each implemented and adversarially verified."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "Computational Life authors" }]
+keywords = [
+    "algorithmic information theory",
+    "Kolmogorov complexity",
+    "self-reference",
+    "recursion theorem",
+    "good regulator",
+    "von Neumann replicator",
+    "Eigen quasispecies",
+    "Landauer limit",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = ["numpy>=1.21"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7", "pytest-cov>=4", "ruff>=0.4"]
+
+[project.scripts]
+complife = "complife.__main__:main"
+
+[tool.setuptools]
+packages = ["complife"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-q --strict-markers"
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests that run the full Monte-Carlo / sweep (deselect with '-m \"not slow\"')",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py39"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = [
+    "E501",   # long explanatory lines in scientific prints are intentional
+    "UP031",  # percent-formatting is load-bearing in the quine constructions
+]

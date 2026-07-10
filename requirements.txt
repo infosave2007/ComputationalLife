@@ -1,0 +1,5 @@
+# Runtime dependencies.
+# numpy is required (quasispecies eigenvalues, Monte-Carlo entropy, WF sampling).
+# SciPy is optional: if absent, entropy_grassberger uses an accurate pure-numpy
+# digamma fallback (verified to match scipy.special.digamma to ~1e-9).
+numpy>=1.21
