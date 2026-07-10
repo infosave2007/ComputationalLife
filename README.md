@@ -6,67 +6,48 @@
 
 🇷🇺 Русская версия: [README.ru.md](README.ru.md)
 
-**A runnable, self-checking answer to one question: what does it actually take — in provable
-math, not hand-waving — for something to copy itself, know itself, and change itself?** These
-are the core tricks we associate with life and mind. This project shows each one is an old,
-exact theorem, and turns it into a tiny program you can run and verify in seconds.
+**Can a computer program copy itself, know itself, and rewrite itself — the same tricks that make you alive and awake?** This project says yes to some of it and a firm no to the rest, and it proves which is which with tiny programs you can run in seconds and watch pass or fail.
 
-## The problem it solves
+Here's the thing. People say a lot of huge stuff about life and minds: "the brain is a computer," "the universe is a simulation," "compression is intelligence." Most of it sounds cool but means nothing you can check. This repo takes a handful of those big ideas and turns each one into a short program that either works or doesn't when you press run. No arguing — just run it and see.
 
-Big claims about life, mind, "self-awareness," "compression is intelligence," "the universe is a
-computer" are everywhere — and almost all of them are vague, untestable, or overhyped. You can't
-tell a **proof** from a **poem**.
+It is **not** a product or a tool that does a job for you. What it gives you is understanding you can trust.
 
-This repository fixes that for a specific, important cluster of those claims: it converts each one
-into a small program that **either passes or fails when you run it**. Philosophy you can execute.
-Concretely, it gives checkable answers to questions people usually only argue about:
+## The questions it answers — with running code
 
-- **Can a program really copy itself — or rewrite itself?** Yes. Here's a 75-character program
-  that prints itself, and one that edits itself.
-- **Can you ever fully predict yourself?** No — and there's an exact floor on how much of yourself
-  must stay unpredictable. (Surprisingly, this is the *same* law as "to control something, you must
-  model it.")
-- **Why can't a self-copying thing carry unlimited information?** Because copying with too many
-  errors destroys the message — a hard threshold. It's why viruses can't have huge genomes.
-- **What are the physical limits of any computer, and how close is a brain to them?** Astonishingly
-  far — a brain uses about a trillionth of a trillionth of its storage ceiling.
+Real questions, with real yes/no answers you can reproduce on your own laptop:
 
-And, just as important, it draws a **hard line between what's proven and what's speculation** (the
-one place it touches exotic physics is fenced off and labeled, not smuggled in as fact).
+- **Can a program really print its own source code — or edit itself?** Yes. There's a **75-character** program here that prints itself, and another that rewrites itself while it runs.
+- **Could you ever perfectly predict your own next move?** No — and there's an exact math floor on how much of yourself must stay a surprise. (Weird bonus: this is the *same* rule as "to steer something, you have to model it.")
+- **Why can't a self-copying thing carry unlimited information?** Because if copying makes too many mistakes, the message turns to noise. There's a hard cliff. It's why viruses can't have giant genomes.
+- **What are the speed and memory limits of *any* computer, and how close is a brain?** Nowhere close. A brain uses about a **trillionth of a trillionth** of its storage ceiling.
 
-## Why it exists
+And it's honest about the edges: the one place it leans on far-out physics is fenced off and labeled, never sneaked in as fact.
 
-Two reasons. First, to give **one honest, unified, tested foundation** for "life and mind as
-computation" — instead of the usual scattered arm-waving, a single picture where self-reproduction,
-self-modeling, self-reference, prediction, and physical limits are all the *same* idea, each proven.
-Second, as a **reality check and teaching tool**: a place where grand claims about minds and
-machines get grounded or rejected, with code anyone can rerun.
+## Why does this exist?
 
-It is **not** a product or a practical utility. Its output is understanding you can trust.
+Two reasons.
+
+**First, to build one honest foundation.** Instead of a hundred hand-wavy blog posts about "life as computation," this shows a single picture where copying yourself, modeling yourself, referring to yourself, predicting yourself, and the physics limits are all the *same* idea — and each piece is proven, not asserted.
+
+**Second, as a reality check and a way to learn.** It's a place where grand claims about minds and machines either get grounded in code or get thrown out. Anyone can rerun the check.
 
 ## The one idea behind all of it
 
-Look closely at anything alive or intelligent and you keep seeing the **same design**: a small set
-of instructions plus a powerful machine that unfolds them.
+Look closely at anything alive or intelligent and you keep spotting the **same design**: a small set of instructions plus a powerful machine that unfolds them.
 
-- A **zip file** is a few kilobytes + an unzipper that rebuilds the whole thing.
-- A **genome** is a recipe + the chemistry that grows it into an animal.
-- Your **sense of self** is a compressed little model + a brain that runs it.
+- A **zip file** is a few kilobytes plus an unzipper that rebuilds the whole thing.
+- A **genome** is a recipe plus the chemistry that grows it into an animal.
+- Your **sense of self** is a tiny compressed model plus a brain that runs it.
 
-The recipe is cheap; the power lives in the decoder. This project makes that idea exact — and
-shows where each version of it **hits a wall it can never cross**.
+The recipe is cheap. The power lives in the thing that decodes it. This project makes that idea exact — and shows where each version of it **slams into a wall it can never get past**.
 
 ## The four parts
 
-Each starts in plain words; the precise math is tucked into a "for the curious" box.
+Each part starts in plain words. The precise math is folded into a "for the curious" box you can open if you want it.
 
 ### 1. A thing can refer to itself — [`self_reference`](complife/self_reference.py)
 
-**In plain words:** A program can print its own source code exactly — a "quine," like a sentence
-that perfectly describes itself (smallest here: **75 characters**). It can go further: compute
-*anything about itself* and even **rewrite itself** — the math behind self-copying code and
-reflection. The catch: a system can point at itself forever but can **never fully "understand"
-itself** (Gödel's limit).
+**In plain words:** A program can print its own source code, exactly — that's called a "quine," like a sentence that perfectly describes itself. The smallest one here is **75 characters**. It can go further: figure out *anything about itself*, and even **rewrite itself**. That's the math behind self-copying code. The catch: a system can point at itself forever but can **never fully "understand" itself** — that's Gödel's famous limit.
 
 <details><summary>The precise version (for the curious)</summary>
 
@@ -80,10 +61,7 @@ Self-reference is purely *syntactic*: it adds no computing power and runs into G
 
 ### 2. You can never fully predict yourself — [`self_model`](complife/self_model.py)
 
-**In plain words:** If your model of the world must include a model of *you*, you can never predict
-yourself perfectly — there's an unavoidable floor of "self-surprise," and the smaller your memory
-budget, the bigger it is. The twist: the rule *"to control something well, you must model it"* turns
-out to be the **exact same inequality**. Steering and self-knowing are one law.
+**In plain words:** If your picture of the world has to include a picture of *you*, then you can never predict yourself perfectly. There's always some leftover "self-surprise," and the smaller your memory, the bigger it gets. The twist: the rule *"to steer something well, you have to model it"* turns out to be the **exact same rule**. Steering and self-knowing are one and the same.
 
 <details><summary>The precise version (for the curious)</summary>
 
@@ -97,12 +75,7 @@ shows the optimal one is forced to be a model of what it controls, with residual
 
 ### 3. Copying yourself works — but only up to a limit — [`replication`](complife/replication.py)
 
-**In plain words:** We build a tiny "organism" — a machine plus a tape used two ways: *read* to
-build the machine, and *copied* untouched to the offspring. It reproduces byte-for-byte and passes
-on mutations. That's von Neumann's 1948 blueprint for self-reproduction — before DNA was understood.
-But there's a hard limit (Eigen's): copy with **too many errors** and the message dissolves into
-noise. It's *why viruses can't have huge genomes* — and why some antiviral drugs work by pushing a
-virus's copy-error rate just past the cliff.
+**In plain words:** We build a tiny "organism": a machine plus a tape used two ways. The tape is *read* to build the machine, and *copied* untouched into the offspring. It reproduces byte-for-byte and passes mutations to its kids. That's von Neumann's 1948 blueprint for self-reproduction — sketched *before* anyone understood DNA. But there's a hard limit, found by Eigen: copy with **too many errors** and the message dissolves into noise. That's *why viruses can't have huge genomes* — and why some antiviral drugs work by nudging a virus's copy-error rate just past the cliff.
 
 <details><summary>The precise version (for the curious)</summary>
 
@@ -115,11 +88,7 @@ brute force to ~10⁻¹⁶; and a finite-population simulation), all agreeing.
 
 ### 4. Physics sets the ceilings — [`physical_limits`](complife/physical_limits.py)
 
-**In plain words:** Physics caps any computer — how much it can store, how fast it can run, the least
-energy a bit can cost. The surprise: a brain uses a **staggeringly tiny slice** of these ceilings.
-Life isn't packed to the physical brim — it's astonishingly sparse. This is also the one place the
-project touches a speculative physics idea, and it's careful to mark that part as a *boundary*, not a
-mechanism.
+**In plain words:** Physics caps every computer: how much it can store, how fast it can run, the least energy one bit can cost. The surprise: a brain uses a **tiny sliver** of these limits. Life isn't crammed to the physical brim — it's astonishingly roomy. This is also the one place the project touches a speculative physics idea, and it's careful to mark that part as a *boundary*, not a proven mechanism.
 
 <details><summary>The precise version (for the curious)</summary>
 
@@ -130,6 +99,17 @@ the Landauer minimum per operation. The speculative NVG section is explicitly mo
 [`NVG_INTERFACE.md`](NVG_INTERFACE.md).
 </details>
 
+## Try it yourself
+
+```bash
+pip install -e .        # only needs Python 3.9+ and numpy
+python -m complife      # runs all four parts and prints PASS/FAIL for each
+```
+
+Each part explains what it's doing and checks itself as it goes. Run just one with
+`python -m complife 03`; the original numbered scripts still work too
+(`python3 01_self_reference_quine.py`).
+
 ## Where this is actually useful
 
 It's a foundations project, but several results connect to real things:
@@ -138,31 +118,21 @@ It's a foundations project, but several results connect to real things:
   and the physics of computation, with each claim tied to a test in [`CLAIMS.md`](CLAIMS.md).
 - **A reality check** on grand claims about minds, compression, and "digital physics" — a template
   for separating what's proven from what's marketing.
-- **Real-world hooks:** Eigen's threshold is the theory behind *lethal-mutagenesis antivirals*; the
-  self-prediction floor bounds *introspective / self-monitoring AI*; Landauer and the speed limits
-  frame *the energy cost of computation* (timely for AI datacenters); the good-regulator law is a
-  *controller-sizing* rule.
-
-## Try it yourself
-
-```bash
-pip install -e .        # only needs Python 3.9+ and numpy
-python -m complife      # runs all four parts and prints PASS/FAIL for each
-```
-
-Each part narrates what it's doing and checks itself as it goes. Run just one with
-`python -m complife 03`; the original numbered scripts still work too
-(`python3 01_self_reference_quine.py`).
+- **Real-world hooks:**
+  - Eigen's threshold is the theory behind *lethal-mutagenesis antivirals*.
+  - The self-prediction floor bounds *introspective / self-monitoring AI*.
+  - Landauer and the speed limits frame *the energy cost of computation* (timely for AI datacenters).
+  - The good-regulator law is a *controller-sizing* rule.
 
 ## Honesty first
 
 Taking it seriously means being clear about what it does **not** claim:
 
-- Every headline statement is backed by a test — [`CLAIMS.md`](CLAIMS.md) maps each claim to the
+- **Every headline statement is backed by a test.** [`CLAIMS.md`](CLAIMS.md) maps each claim to the
   function and test that proves it. `make test` runs all 51 in ~8 seconds.
 - **It does not explain consciousness.** "A self-modeling, self-editing program = self-awareness" is
   an unproven philosophical leap, and this project refuses to make it.
-- **It invents no new physics and beats no known limit.** Classic information theory + cybernetics
+- **It invents no new physics and beats no known limit.** Just classic information theory + cybernetics
   (Kleene, Conant–Ashby, von Neumann, Eigen, Shannon, Solomonoff/Hutter). The one exotic-physics link
   (NVG) is a clearly-labeled *boundary*, never a mechanism — [`NVG_INTERFACE.md`](NVG_INTERFACE.md).
 
