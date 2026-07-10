@@ -52,3 +52,15 @@ def test_sparseness_all_below_ceiling():
     rows = pl.sparseness_table()
     assert all(r["f_bek"] < 1e-15 for r in rows)
     assert all(r["f_holo"] < 1e-50 for r in rows)
+
+
+def test_llm_inference_far_above_landauer_floor():
+    floor = pl.llm_landauer_floor_per_token(70e9)
+    assert floor == pytest.approx(7.5e-9, rel=0.2)     # ~7.5 nJ/token
+    ratio = 1.0 / floor                                # ~1 J/token served
+    assert ratio > 1e6                                 # >6 orders above the floor
+    assert math.log10(ratio) == pytest.approx(8.0, abs=0.5)
+
+
+def test_gpu_erasure_ceiling_positive():
+    assert pl.gpu_max_bit_erasures_per_s(700.0) > 1e22

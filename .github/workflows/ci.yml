@@ -13,6 +13,11 @@ jobs:
       fail-fast: false
       matrix:
         python-version: ["3.9", "3.11", "3.12"]
+        numpy-version: ["1.26.*", "2.*"]
+        exclude:
+          # numpy 2 requires Python >= 3.9; pin the oldest combo to numpy 1.x.
+          - python-version: "3.9"
+            numpy-version: "2.*"
     steps:
       - uses: actions/checkout@v4
 
@@ -25,6 +30,7 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           python -m pip install -e ".[dev]"
+          python -m pip install "numpy==${{ matrix.numpy-version }}"
 
       - name: Lint
         run: ruff check complife tests

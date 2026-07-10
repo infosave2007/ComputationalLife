@@ -9,18 +9,25 @@ Four self-contained, adversarially verified modules:
 * :mod:`complife.replication`     — von Neumann's dual-use tape and Eigen's
   quasispecies error threshold.
 * :mod:`complife.physical_limits` — Landauer / Bekenstein / holographic / speed
-  ceilings, plus the one honest contact point with NVG physics.
+  ceilings (incl. LLM inference vs the Landauer floor), plus the one honest
+  contact point with NVG physics.
+* :mod:`complife.quantum`         — the fifth wall: an unknown quantum state
+  cannot be copied (no-cloning), contrasting classical self-copying.
+* :mod:`complife.induction`       — prediction = compression: the shortest
+  program wins (Solomonoff / MDL), with the incompressible-data boundary.
 
 Everything is substrate-independent information theory and cybernetics; physics
 enters only as ceilings on the hardware (module 4).
 """
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 __all__ = [
     "self_reference",
     "self_model",
     "replication",
     "physical_limits",
+    "quantum",
+    "induction",
     "common",
 ]

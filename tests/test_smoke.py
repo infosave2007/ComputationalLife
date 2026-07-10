@@ -6,7 +6,14 @@ Run with `pytest` (full) or skip with `pytest -m "not slow"`.
 
 import pytest
 
-from complife import physical_limits, replication, self_model, self_reference
+from complife import (
+    induction,
+    physical_limits,
+    quantum,
+    replication,
+    self_model,
+    self_reference,
+)
 
 
 @pytest.mark.slow
@@ -15,7 +22,10 @@ from complife import physical_limits, replication, self_model, self_reference
     self_model.demo,
     replication.demo,
     physical_limits.demo,
-], ids=["self_reference", "self_model", "replication", "physical_limits"])
+    quantum.demo,
+    induction.demo,
+], ids=["self_reference", "self_model", "replication", "physical_limits",
+        "quantum", "induction"])
 def test_demo_all_checks_pass(demo, capsys):
     ok = demo()
     captured = capsys.readouterr()

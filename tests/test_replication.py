@@ -99,3 +99,23 @@ def test_wright_fisher_persists_and_collapses():
                                           gens=300, reps=8, seed=0)
     assert mean_lo > 0.05
     assert mean_hi < 0.01
+
+
+# ---- Part C: fitness landscapes -------------------------------------------
+def test_landscape_reduces_to_single_peak():
+    # fitness = [sigma, 1, ...] must match the single-peak quasispecies.
+    import numpy as np
+    sigma, L, mu = math.e, 8, 0.05
+    f = np.ones(L + 1)
+    f[0] = sigma
+    p_land, _ = rep.quasispecies_landscape(f, mu)
+    p_peak, _ = rep.quasispecies_distribution(sigma, L, mu)
+    assert np.max(np.abs(p_land - p_peak)) < 1e-12
+
+
+def test_survival_of_the_flattest_crossover():
+    rows = rep.survival_of_the_flattest()
+    assert rows[0]["winner"] == "sharp"      # tall peak wins at low mutation
+    assert rows[-1]["winner"] == "flat"      # flat peak wins at high mutation
+    winners = [r["winner"] for r in rows]
+    assert any(winners[i] != winners[i + 1] for i in range(len(winners) - 1))

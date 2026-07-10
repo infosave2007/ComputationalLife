@@ -1,5 +1,49 @@
 # Changelog
 
+## 0.3.0 — two new walls, two extended bridges
+
+Extended the project beyond the original four modules, keeping the "proven, not
+asserted" rule. 72 tests, all green; ruff clean.
+
+### New modules
+- **`quantum`** — the fifth impossibility: an unknown quantum state **cannot be
+  copied** (no-cloning), shown two independent ways in pure numpy (linearity turns
+  a copy attempt into a Bell state; unitarity forbids it for non-orthogonal states),
+  contrasted with the cheap *classical* copying that makes module 03 possible.
+- **`induction`** — **prediction = compression** (Solomonoff / MDL): a
+  shortest-program search recovers an LCG generator from a handful of samples and
+  compresses its "random-looking" stream ~1000× (32 000 bits → a 32-bit program),
+  while correctly failing on truly
+  random data (no codec beats Shannon). No LLM, fully deterministic; honest that
+  true Solomonoff induction is uncomputable.
+
+### Extended modules
+- **`replication`** — arbitrary **fitness landscapes** via `quasispecies_landscape`,
+  demonstrating **survival of the flattest**: past a crossover mutation rate a
+  shorter, wider peak out-grows a taller, narrower one.
+- **`physical_limits`** — **LLM inference vs the Landauer floor**: a 70B model
+  serves at ~10⁸× the thermodynamic minimum (~7.5 nJ/token floor), the same
+  sparseness lesson as the brain, now for a datacenter GPU.
+- **`self_model`** — **multi-agent regulation** (regulator capacities add:
+  `H(Z) = max(0, k − Σbᵢ)`) and a **weight-quantization** demo (compressing a
+  model's parameters raises its prediction cost — the `H(T|M)` floor for weights).
+- **`self_reference`** — **Rice's theorem** constructively: every candidate decider
+  of a non-trivial semantic property is refuted by its own diagonal program.
+
+### On a proposed NVG addition (declined as stated, done honestly instead)
+A suggestion to add a module "testing `ρ_c` / `M_crit` as numerical predictions" was
+**not** implemented in that form: those quantities are *asserted NVG model inputs*
+(the 859 MeV scale + melt mechanism), not first-principles predictions, and framing
+them as validated predictions would be the exact category error `NVG_INTERFACE.md`
+exists to prevent. What is honest — and already present — is the **internal
+geometric-consistency** check (`test_nvg_core_geometry_consistent`); that is the
+ceiling of what can be claimed.
+
+### Deferred
+- A verified Brainfuck quine (needs a published quine matching this interpreter's
+  exact cell/EOF convention) — the interpreter is tested via Hello-World; the quine
+  is cited, not run.
+
 ## 0.2.0 — rigor & packaging pass
 
 Turned four self-contained scripts into a tested, packaged project, and upgraded every

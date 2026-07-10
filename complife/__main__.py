@@ -12,7 +12,14 @@ from __future__ import annotations
 import sys
 from typing import Callable
 
-from . import physical_limits, replication, self_model, self_reference
+from . import (
+    induction,
+    physical_limits,
+    quantum,
+    replication,
+    self_model,
+    self_reference,
+)
 from .common import header
 
 MODULES: dict[str, Callable[[], bool]] = {
@@ -20,6 +27,8 @@ MODULES: dict[str, Callable[[], bool]] = {
     "02": self_model.demo,
     "03": replication.demo,
     "04": physical_limits.demo,
+    "05": quantum.demo,
+    "06": induction.demo,
 }
 
 

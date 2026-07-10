@@ -73,3 +73,11 @@ def test_self_modification_counter_and_invariance():
 def test_self_read_programs_reproduce_source():
     _, ok = sr.measure_self_read_overhead()
     assert ok
+
+
+@pytest.mark.slow
+def test_rice_theorem_every_decider_refuted():
+    results = sr.verify_rice()
+    assert len(results) >= 4
+    for name, refuted in results:
+        assert refuted, f"decider {name} was not refuted by its diagonal"

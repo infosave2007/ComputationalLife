@@ -318,6 +318,47 @@ def quasispecies_critical_mu(sigma: float, L: int, level: float = 0.01,
 
 
 # =========================================================================== #
+# PART C -- arbitrary fitness landscapes & survival of the flattest
+# =========================================================================== #
+def quasispecies_landscape(fitness: np.ndarray, mu: float
+                           ) -> tuple[np.ndarray, float]:
+    """Quasispecies distribution for an ARBITRARY per-Hamming-class fitness vector.
+
+    `fitness[k]` is the reproduction rate of error class k (length L+1). Returns
+    (p, mean_fitness): p is the stationary class distribution, mean_fitness is the
+    dominant eigenvalue = the population's asymptotic growth rate. The single-peak
+    model is the special case fitness = [sigma, 1, 1, ...]."""
+    L = len(fitness) - 1
+    Q = hamming_transition_matrix(L, mu)
+    W = Q @ np.diag(np.asarray(fitness, dtype=np.float64))
+    return _perron(W)
+
+
+def survival_of_the_flattest(L: int = 20, sharp_h: float = 1.5,
+                             flat_h: float = 1.42, flat_w: int = 3,
+                             mu_grid: list[float] | None = None
+                             ) -> list[dict[str, float]]:
+    """Compare a TALL-NARROW peak against a SHORTER-WIDER (flatter) one across a
+    mutation-rate sweep. At low mu the taller peak grows faster; past a crossover
+    the flatter peak wins because it is mutationally robust — "survival of the
+    flattest" (Wilke et al. 2001). Winner = higher dominant eigenvalue."""
+    if mu_grid is None:
+        # includes the crossover neighbourhood (~0.0055) so it is visible in the table
+        mu_grid = [0.002, 0.005, 0.006, 0.01, 0.02, 0.05, 0.12]
+    f_sharp = np.ones(L + 1)
+    f_sharp[0] = sharp_h
+    f_flat = np.ones(L + 1)
+    f_flat[: flat_w + 1] = flat_h
+    rows = []
+    for mu in mu_grid:
+        _, lam_sharp = quasispecies_landscape(f_sharp, mu)
+        _, lam_flat = quasispecies_landscape(f_flat, mu)
+        rows.append({"mu": mu, "lam_sharp": lam_sharp, "lam_flat": lam_flat,
+                     "winner": "sharp" if lam_sharp > lam_flat else "flat"})
+    return rows
+
+
+# =========================================================================== #
 # PART B3 -- exact finite-population Wright-Fisher
 # =========================================================================== #
 def wf_master_fraction(mu: float, L: int, sigma: float, N: int, gens: int,
@@ -456,22 +497,48 @@ def part_b(report: Report) -> dict[str, object]:
     }
 
 
+def part_c(report: Report) -> dict[str, object]:
+    print("\n" + header("PART C -- fitness landscapes & survival of the flattest"))
+    print("A TALL-NARROW peak (height 1.50 at class 0) vs a SHORTER-WIDER one")
+    print("(height 1.42 across classes 0-3). Winner = faster asymptotic growth.\n")
+    rows = survival_of_the_flattest()
+    print("     mu      sharp growth    flat growth    winner")
+    print("   " + "-" * 52)
+    low_sharp = high_flat = False
+    for r in rows:
+        print(f"   {r['mu']:<7.3f}  {r['lam_sharp']:<13.6f}  {r['lam_flat']:<12.6f}  {r['winner']}")
+        if r["mu"] <= 0.002:
+            low_sharp = r["winner"] == "sharp"
+        if r["mu"] >= 0.12:
+            high_flat = r["winner"] == "flat"
+    report.check("tall-narrow peak wins at LOW mutation (height matters)", low_sharp)
+    report.check("flatter peak wins at HIGH mutation (robustness matters)", high_flat)
+    winners = [r["winner"] for r in rows]
+    crossover = any(winners[i] != winners[i + 1] for i in range(len(winners) - 1))
+    report.check("there is a crossover mutation rate (survival of the flattest)", crossover)
+    return {"flattest_crossover": crossover}
+
+
 # =========================================================================== #
 def demo() -> bool:
     print(header("Self-reproduction: von Neumann's tape + Eigen's error threshold"))
     report = Report()
     res_a = part_a(report)
     res_b = part_b(report)
+    res_c = part_c(report)
 
     print("\n" + header("SUMMARY"))
     print("A) Dual-use tape (interpret + verbatim copy) => byte-exact, self-booting,")
     print("   mutation-heritable self-reproduction; parent->child is an O(1) operator.")
     print("B) Eigen threshold mu_crit*L -> ln(sigma), shown three ways (closed form,")
     print("   exact quasispecies eigenvector vs 2^L brute force, and finite-N WF).")
+    print("C) On an arbitrary fitness landscape, a flatter peak can out-grow a taller")
+    print("   one past a crossover mutation rate — survival of the flattest.")
     print(f"\n{report.summary()}")
     print("ALL CHECKS PASSED" if report.ok else "SOME CHECKS FAILED")
 
-    save_result("03_replication", {**res_a, **res_b, "all_checks_passed": report.ok})
+    save_result("03_replication", {**res_a, **res_b, **res_c,
+                                   "all_checks_passed": report.ok})
     return report.ok
 
 

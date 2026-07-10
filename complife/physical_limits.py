@@ -75,6 +75,23 @@ def landauer_floor_power(rate: float, T: float) -> float:
     return rate * KB * T * LN2
 
 
+def gpu_max_bit_erasures_per_s(power: float, T: float = 350.0) -> float:
+    """Max irreversible bit-erasures/s for a chip drawing `power` watts at die
+    temperature T (default 350 K ≈ 77 C)."""
+    return power / (KB * T * LN2)
+
+
+def llm_landauer_floor_per_token(params: float, bits_per_flop: float = 16.0,
+                                 T: float = 350.0) -> float:
+    """Landauer floor energy (J) for one generated token of a dense P-parameter
+    Transformer: a forward pass is ~2P FLOPs/token; charge `bits_per_flop`
+    irreversible bit-erasures per FLOP (a conservative lower bound). This is the
+    thermodynamic MINIMUM — real hardware is far above it."""
+    flops = 2.0 * params
+    bit_ops = flops * bits_per_flop
+    return bit_ops * KB * T * LN2
+
+
 # --------------------------------------------------------------------------- #
 #  NVG regular-core geometry (all quantities flagged as model-dependent)
 # --------------------------------------------------------------------------- #
@@ -213,8 +230,24 @@ def demo() -> bool:
     report.check("every system is >=15 orders below Bekenstein and >=50 below holographic",
                  max_bek < 1e-15 and max_holo < 1e-50)
 
-    # 6. NVG interface ------------------------------------------------------
-    print("\n6. NVG INTERFACE (model input: M_Omega = 859 MeV, vacuum 'melts' at rho_c):")
+    # 6. Today's hardware: LLM inference vs the Landauer floor -----------------
+    print("\n6. TODAY'S COMPUTE: an LLM datacenter vs the Landauer floor (same lesson):")
+    P_gpu = 700.0                       # ~H100 board power, W
+    print(f"     one ~700 W GPU could erase up to {gpu_max_bit_erasures_per_s(P_gpu):.2e} bits/s (Landauer ceiling)")
+    params = 70e9                       # 70B-parameter dense model
+    floor_token = llm_landauer_floor_per_token(params)
+    actual_token = 1.0                  # ~1 J/token, order-of-magnitude for a served 70B model
+    ratio = actual_token / floor_token
+    print(f"     70B model: Landauer floor ~ {floor_token:.2e} J/token "
+          f"(~{floor_token / 1e-9:.1f} nJ); real serving ~ {actual_token:.0e} J/token")
+    print(f"     => LLM inference runs ~10^{math.log10(ratio):.0f} ABOVE the thermodynamic minimum")
+    print("     (same story as the brain: nowhere near the physical wall — but profligate")
+    print("      in energy per operation; reversible computing is the only way down.)")
+    report.check("LLM inference sits >=1e6x above the Landauer floor",
+                 ratio > 1e6)
+
+    # 7. NVG interface ------------------------------------------------------
+    print("\n7. NVG INTERFACE (model input: M_Omega = 859 MeV, vacuum 'melts' at rho_c):")
     nvg = nvg_core()
     print(f"     rho_c = M_Omega^4/(hbar c)^3 = {nvg['rho_c_energy']:.3e} J/m^3 "
           f"= {nvg['rho_c_mass']:.3e} kg/m^3   [NVG INPUT, not derived here]")
@@ -250,6 +283,8 @@ def demo() -> bool:
         "margolus_levitin_brain_ops_s": ml_brain,
         "bremermann_per_kg": bremermann_rate_per_kg(),
         "landauer_20W_erasures_s": n_dot,
+        "llm_landauer_floor_j_per_token": floor_token,
+        "llm_above_landauer_ratio": ratio,
         "nvg_l_core_m": nvg["l_core"],
         "nvg_r_h_m": nvg["r_h"],
         "nvg_M_crit_Msun": nvg["M_crit_Msun"],

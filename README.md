@@ -99,11 +99,31 @@ the Landauer minimum per operation. The speculative NVG section is explicitly mo
 [`NVG_INTERFACE.md`](NVG_INTERFACE.md).
 </details>
 
+## Two more walls, freshly added
+
+The same "prove it, don't assert it" treatment, extending the picture:
+
+### 5. Quantum states can't be copied at all — [`quantum`](complife/quantum.py)
+
+**In plain words:** Part 3 showed *classical* copying is easy. Quantum information says the
+opposite: you **cannot copy an unknown quantum state** — full stop. Try to, and physics hands you
+an entangled mess instead of a copy. We show this in ~40 lines of linear algebra, two independent
+ways, and contrast it with the classical bits that *can* be copied (which is exactly what lets
+life reproduce). Copying: cheap for bits, forbidden for quantum states.
+
+### 6. "Intelligence is compression," made precise — [`induction`](complife/induction.py)
+
+**In plain words:** The best way to predict a sequence is to find the **shortest program** that
+makes it (Solomonoff, Hutter). We show a tiny "shortest-program" search crack a stream that *looks*
+totally random — recovering the hidden generator from a handful of samples and compressing it
+**1000×**, where ordinary statistics is helpless. And we show the honest flip side: on **truly**
+random data, nothing beats the entropy. Compression finds structure — but it can't invent it.
+
 ## Try it yourself
 
 ```bash
 pip install -e .        # only needs Python 3.9+ and numpy
-python -m complife      # runs all four parts and prints PASS/FAIL for each
+python -m complife      # runs all six parts and prints PASS/FAIL for each
 ```
 
 Each part explains what it's doing and checks itself as it goes. Run just one with
@@ -136,6 +156,22 @@ Taking it seriously means being clear about what it does **not** claim:
   (Kleene, Conant–Ashby, von Neumann, Eigen, Shannon, Solomonoff/Hutter). The one exotic-physics link
   (NVG) is a clearly-labeled *boundary*, never a mechanism — [`NVG_INTERFACE.md`](NVG_INTERFACE.md).
 
+## Known limitations
+
+Being a serious project also means naming the edges:
+
+- **`replication` models information, not energy.** The replicator and the error threshold are
+  purely informational; the *energy* cost of copying isn't modeled here (that would be the natural
+  bridge to `physical_limits`).
+- **`induction` uses a small, explicit hypothesis class.** True Solomonoff induction is
+  uncomputable, so the shortest-program search is an honest approximation — exactly what real
+  compressors do — not the ideal.
+- **The Brainfuck quine is cited, not run.** The interpreter is verified via Hello-World; a
+  published BF quine matching its exact cell/EOF convention is future work.
+- **The NVG section is model-dependent by construction.** `ρ_c` and `M_crit` rest on asserted
+  inputs (the 859 MeV scale, the melt mechanism); only their internal geometric consistency is
+  tested — never treated as first-principles predictions. See [`NVG_INTERFACE.md`](NVG_INTERFACE.md).
+
 ## For developers
 
 ```bash
@@ -146,11 +182,13 @@ make lint        # ruff
 
 ```
 complife/            the tested package
-  self_reference.py  quines, the recursion theorem, self-editing programs
-  self_model.py      the self-prediction floor, the good-regulator theorem
-  replication.py     the self-copying organism, Eigen's error threshold
-  physical_limits.py storage / speed / energy ceilings
-tests/               one test file per part (51 tests total)
+  self_reference.py  quines, recursion theorem, Rice's theorem, self-editing programs
+  self_model.py      self-prediction floor, good regulator, multi-agent, weight quantization
+  replication.py     the self-copying organism, Eigen's threshold, fitness landscapes
+  physical_limits.py storage / speed / energy ceilings, LLM vs Landauer
+  quantum.py         the no-cloning wall
+  induction.py       prediction = compression (Solomonoff / MDL)
+tests/               one test file per part (72 tests total)
 CLAIMS.md            every claim -> the function -> the test that proves it
 ```
 

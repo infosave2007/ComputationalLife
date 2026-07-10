@@ -38,6 +38,7 @@ false — that is the point. Run `make test` to check them all.
 | The **full** quasispecies eigenvector matches brute-force `2^L` | `quasispecies_distribution`, `quasispecies_bruteforce` | `test_lumped_quasispecies_matches_bruteforce` | exact Hamming-class lumping; agreement `~10⁻¹⁶` |
 | The full model's master fraction is smooth & >0 at finite L | `quasispecies_distribution` | `test_full_model_master_fraction_smooth_positive` | the sharp catastrophe is the `L→∞` / no-back-mutation limit |
 | Finite-N Wright–Fisher persists below / collapses above threshold | `wf_survival_curve` | `test_wright_fisher_persists_and_collapses` | exact `numpy` binomial (fixes a Gaussian-approx + rare `log(0)` crash) |
+| On an arbitrary fitness landscape, a **flatter** peak out-grows a taller one past a crossover mutation rate | `quasispecies_landscape`, `survival_of_the_flattest` | `test_survival_of_the_flattest_crossover`, `test_landscape_reduces_to_single_peak` | "survival of the flattest" (Wilke 2001); winner = larger dominant eigenvalue |
 
 ## `physical_limits` — ceilings & the NVG boundary
 
@@ -48,3 +49,33 @@ false — that is the point. Run `make test` to check them all.
 | Speed ceilings: ML 7.6×10⁵⁰, Bremermann 1.36×10⁵⁰/kg, Lloyd 5.4×10⁵⁰ ops/s | `margolus_levitin_rate`, `bremermann_rate_per_kg`, `lloyd_ultimate_laptop` | `test_speed_ceilings` | upper bounds only; ML vs Bremermann differ by an O(1) convention |
 | Landauer throughput at 20 W / 310 K ≈ 6.7×10²¹ erasures/s | `landauer_max_erasures_per_s` | `test_landauer_throughput_and_floor_inverse` | brain runs ~7 orders above the per-bit minimum |
 | NVG core: `r_h = √3·l`, `S_BH = 3·S(l)`, density loop closes, `M_crit ≈ 0.99 M⊙` | `nvg_core` | `test_nvg_core_geometry_consistent` | `M_Ω = 859 MeV` and the melt mechanism are **NVG model inputs**, not derived; below `M_crit` there is no horizon, so core entropy is model-dependent |
+| LLM inference runs ~10⁸× above the Landauer floor (~7.5 nJ/token) | `llm_landauer_floor_per_token`, `gpu_max_bit_erasures_per_s` | `test_llm_inference_far_above_landauer_floor` | I_used/energy figures are order-of-magnitude; conclusion (many orders above the floor) is robust |
+
+## `self_model` — regulation, multi-agent & model compression (additions)
+
+| Claim | Function | Test | Caveat |
+|---|---|---|---|
+| Several regulators' capacities **add**: residual `H(Z) = max(0, k − Σbᵢ)` | `multi_agent_residual` | `test_multi_agent_capacities_add` | holds when the agents observe disjoint slices of the disturbance |
+| **Compressing a model's own weights raises its prediction cost** (excess grows as bits shrink) | `demo_quantization` | `test_weight_quantization_raises_prediction_cost` | the `H(T\|M) ≥ H(T) − b_M` floor applied to parameters — the honest core of the "quantization loses self-predictability" intuition |
+
+## `quantum` — the fifth wall: no-cloning
+
+| Claim | Function | Test | Caveat |
+|---|---|---|---|
+| Classical basis states copy perfectly (CNOT) | `clone_fidelity`, `classical_copy_works` | `test_classical_basis_states_clone` | this is what lets a classical replicator (module 03) exist |
+| An unknown **superposition cannot be cloned**: CNOT entangles it (fidelity 1/2) | `clone_attempt_cnot`, `linearity_forces_entanglement` | `test_superposition_cannot_be_cloned_fidelity_half`, `test_clone_attempt_is_the_bell_state` | forced by *linearity*, not technology |
+| No cloning unitary exists for non-orthogonal states (`⟨ψ\|φ⟩ = ⟨ψ\|φ⟩²`) | `inner_product_obstruction` | `test_inner_product_obstruction`, `test_random_nonorthogonal_pairs_forbid_cloning` | independent proof (unitarity preserves inner products) |
+
+## `induction` — prediction = compression (Solomonoff / MDL)
+
+| Claim | Function | Test | Caveat |
+|---|---|---|---|
+| A short-program search **recovers the generator** and crushes statistics on algorithmically-simple data | `infer_lcg`, `mdl_codelen` | `test_lcg_is_recovered_and_reproduces`, `test_mdl_beats_statistics_on_algorithmic_data` | hypothesis class is small & explicit; true Solomonoff is **uncomputable** |
+| On **truly random** data no predictor beats the entropy (MDL correctly gives up) | `mdl_codelen`, `best_statistical_codelen` | `test_true_randomness_is_incompressible` | you cannot compress below Shannon / Kolmogorov |
+| Two-part code (`\|program\| + \|data\|program\|`) compresses an LCG stream >100× | `mdl_codelen` | `test_two_part_code_compresses_lcg` | this is exactly the quantity the Hutter Prize scores |
+
+## `self_reference` — Rice's theorem (addition)
+
+| Claim | Function | Test | Caveat |
+|---|---|---|---|
+| **No decider of a non-trivial semantic property survives its own diagonal** program | `build_diagonal`, `verify_rice` | `test_rice_theorem_every_decider_refuted` | constructive halting/Rice: every candidate decider is refuted by a program built against it |

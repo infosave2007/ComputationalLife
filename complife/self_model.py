@@ -418,6 +418,84 @@ def demo_conant_ashby(report: Report) -> dict[str, object]:
     return {"min_HZ": minH, "n_optimal_policies": len(optimal), "bit_floor_ok": floor_ok}
 
 
+def multi_agent_residual(k: int, budgets: list[int]) -> float:
+    """Several regulators of Z = (D + sum R_i) mod 2^k, each seeing a DISJOINT
+    block of bits of D. Their capacities add: the residual variety is
+    H(Z) = max(0, k - sum(budgets)). Returns the measured H(Z)."""
+    n = 1 << k
+    p_D = 1.0 / n
+    # assign disjoint bit-blocks to agents until k bits are covered
+    assigned = 0
+    blocks = []
+    for b in budgets:
+        take = min(b, k - assigned)
+        blocks.append((assigned, take))   # (start bit-from-top, width)
+        assigned += take
+    zdist: dict[int, float] = defaultdict(float)
+    for d in range(n):
+        action = 0
+        for start, width in blocks:
+            if width == 0:
+                continue
+            shift = k - start - width
+            block_val = (d >> shift) & ((1 << width) - 1)
+            action += (-(block_val << shift)) % n   # cancel this block
+        zdist[(d + action) % n] += p_D
+    return _entropy_of_dist(zdist)
+
+
+def demo_multi_agent(report: Report) -> dict[str, object]:
+    print("\n" + header("Multi-agent regulation: capacities add", "-"))
+    print("  Z = (D + R1 + R2 + ...) mod 2^k, disturbance D on k=4 bits.")
+    print("  Each regulator sees a disjoint slice of D; residual should be k - sum(budgets).\n")
+    k = 4
+    print("     budgets       sum b    measured H(Z)    floor max(0,k-sum)   match?")
+    all_ok = True
+    for budgets in ([1], [2, 1], [2, 2], [1, 1, 1], [3, 3]):
+        hz = multi_agent_residual(k, budgets)
+        floor = max(0, k - sum(budgets))
+        ok = abs(hz - floor) < 1e-9
+        all_ok = all_ok and ok
+        print(f"     {str(budgets):13s} {sum(budgets):>4d}     {hz:>10.4f}       {floor:>10d}        {ok}")
+    report.check("multi-agent residual H(Z) = max(0, k - sum budgets) (capacities add)",
+                 all_ok)
+    return {"multi_agent_ok": all_ok}
+
+
+def demo_quantization(report: Report, C: int = 400, K: int = 16,
+                      seed: int = 0) -> dict[str, object]:
+    """Compressing a model's OWN parameters raises its prediction cost — the
+    self-model bit-budget floor, applied to weights (the honest core of the
+    'LLM quantization loses self-predictability' intuition)."""
+    print("\n" + header("Compressing a model's weights raises its prediction cost", "-"))
+    rng = np.random.default_rng(seed)
+    logits = rng.normal(0, 2.5, size=(C, K))            # the 'model'
+    ex = np.exp(logits - logits.max(axis=1, keepdims=True))
+    true = ex / ex.sum(axis=1, keepdims=True)           # its true next-symbol dists
+    base_H = float(np.mean(-np.sum(true * np.log2(true + 1e-30), axis=1)))
+    print(f"  model over {C} contexts x {K} symbols; true prediction entropy = {base_H:.4f} bits")
+    print("     weight bits/param   cross-entropy   excess over model's own entropy")
+    prev_excess = -1.0
+    monotone = True
+    for qbits in (8, 5, 3, 2, 1):
+        lo, hi = logits.min(), logits.max()
+        step = (hi - lo) / (2 ** qbits - 1)
+        q = lo + np.round((logits - lo) / step) * step   # uniform-quantized weights
+        eq = np.exp(q - q.max(axis=1, keepdims=True))
+        pred = eq / eq.sum(axis=1, keepdims=True)
+        ce = float(np.mean(-np.sum(true * np.log2(pred + 1e-30), axis=1)))
+        excess = ce - base_H
+        if prev_excess >= 0 and excess < prev_excess - 1e-6:
+            monotone = False
+        prev_excess = excess
+        print(f"     {qbits:>13d}      {ce:>10.4f}       +{excess:.4f}")
+    report.check("coarser weights => higher prediction cost (excess grows as bits shrink)",
+                 monotone and prev_excess > 0.0)
+    print("  => fewer bits in the model = a lossier self-model = worse prediction:")
+    print("     the H(T|M) >= H(T) - b_M floor, now applied to the model's own parameters.")
+    return {"quantization_excess_1bit": prev_excess}
+
+
 # --------------------------------------------------------------------------- #
 #  Main
 # --------------------------------------------------------------------------- #
@@ -447,6 +525,8 @@ def demo() -> bool:
     res_ci = demo_bootstrap_ci(report)
     res_nu = demo_nonuniform_sources(report)
     res_ca = demo_conant_ashby(report)
+    res_ma = demo_multi_agent(report)
+    res_q = demo_quantization(report)
 
     print("\n" + header("CONCLUSION"))
     print("A b_M-bit deterministic self-model leaves H(T|M) >= H(T) - b_M bits of")
@@ -459,7 +539,7 @@ def demo() -> bool:
 
     save_result("02_self_model", {
         "all_impossible": all_impossible,
-        **res_dpi, **res_ci, **res_nu, **res_ca,
+        **res_dpi, **res_ci, **res_nu, **res_ca, **res_ma, **res_q,
         "all_checks_passed": report.ok,
     })
     return report.ok

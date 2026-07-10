@@ -313,6 +313,50 @@ def verify_self_modification(k: int = 5) -> tuple[bool, bool]:
 
 
 # =========================================================================== #
+# 3b. Rice's theorem, constructively: no decider survives its own diagonal
+# =========================================================================== #
+# For ANY claimed decider of the non-trivial semantic property "does this program
+# print 'YES'?", we build (via the same self-reference trick) a program that asks
+# the decider about ITSELF and then does the OPPOSITE. Its real behaviour always
+# contradicts the decider's verdict -> that decider is wrong. Since this works
+# against every decider, no correct decider can exist (Rice / undecidability).
+_RICE = ("s = %r\n"
+         "f = %r\n"
+         "src = s %% (s, f)\n"
+         "exec(f)\n"
+         "import sys; sys.stdout.write('YES' if not decides(src) else 'NO')")
+
+
+def build_diagonal(decider_body: str) -> str:
+    """Program that computes `decides(own_source)` then prints the OPPOSITE."""
+    return _RICE % (_RICE, decider_body)
+
+
+CANDIDATE_DECIDERS: dict[str, str] = {
+    "always-YES": "def decides(src):\n    return True",
+    "always-NO": "def decides(src):\n    return False",
+    "has-YES-literal": "def decides(src):\n    return \"YES\" in src",
+    "even-length": "def decides(src):\n    return len(src) % 2 == 0",
+}
+
+
+def verify_rice() -> list[tuple[str, bool]]:
+    """Each candidate decider is refuted by its own diagonal program: the
+    program's actual behaviour differs from what the decider predicted."""
+    results = []
+    for name, body in CANDIDATE_DECIDERS.items():
+        src = build_diagonal(body)
+        out = _run_bytes(src.encode("utf-8")).decode("utf-8")
+        actual_prints_yes = out == "YES"
+        ns: dict[str, object] = {}
+        exec(body, ns)  # noqa: S102 -- the candidate decider under test
+        predicted = bool(ns["decides"](src))  # type: ignore[operator]
+        refuted = predicted != actual_prints_yes
+        results.append((name, refuted))
+    return results
+
+
+# =========================================================================== #
 # 4a. repr-inlining augmentation -- honest O(#escapes) characterisation
 # =========================================================================== #
 _TAIL = ("exec(p)\n"
@@ -421,6 +465,11 @@ def demo() -> bool:
     counter_ok, invariant_ok = verify_self_modification(k=5)
     report.check("self-modifier counter reads 0,1,...,5 across generations", counter_ok)
     report.check("only the fixed-width counter field changes (rest invariant)", invariant_ok)
+
+    print("\n[3b] Rice's theorem: every decider of 'does this print YES?' is refuted")
+    print("     by its own diagonal program (it asks the decider, then does the opposite):")
+    for name, refuted in verify_rice():
+        report.check(f"decider '{name}' is wrong on its own diagonal program", refuted)
 
     print("\n[4a] repr-inlining overhead is O(#escapes), constant ONLY escape-free:")
     print("      {:22s} {:>8s} {:>9s} {:>10s}".format("payload", "escapes", "overhead", "159+esc?"))

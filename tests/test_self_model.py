@@ -80,3 +80,31 @@ def test_conant_ashby_bit_budget_matches_self_model_floor():
             zdist[(d + action) % n] += 1.0 / n
         Hz = -sum(p * math.log2(p) for p in zdist.values() if p > 0)
         assert Hz == pytest.approx(k - b, abs=1e-9)
+
+
+def test_multi_agent_capacities_add():
+    k = 4
+    for budgets in ([1], [2, 1], [2, 2], [1, 1, 1], [3, 3]):
+        hz = sm.multi_agent_residual(k, budgets)
+        assert hz == pytest.approx(max(0, k - sum(budgets)), abs=1e-9)
+
+
+def test_weight_quantization_raises_prediction_cost():
+    # Coarser weights => a lossier self-model => strictly higher cross-entropy.
+    rng = np.random.default_rng(0)
+    logits = rng.normal(0, 2.5, size=(300, 16))
+    ex = np.exp(logits - logits.max(axis=1, keepdims=True))
+    true = ex / ex.sum(axis=1, keepdims=True)
+    base_H = float(np.mean(-np.sum(true * np.log2(true + 1e-30), axis=1)))
+
+    def ce_at(qbits):
+        lo, hi = logits.min(), logits.max()
+        step = (hi - lo) / (2 ** qbits - 1)
+        q = lo + np.round((logits - lo) / step) * step
+        eq = np.exp(q - q.max(axis=1, keepdims=True))
+        pred = eq / eq.sum(axis=1, keepdims=True)
+        return float(np.mean(-np.sum(true * np.log2(pred + 1e-30), axis=1)))
+
+    ce8, ce2 = ce_at(8), ce_at(2)
+    assert ce8 >= base_H - 1e-9            # cross-entropy never below the model's own entropy
+    assert ce2 > ce8                        # fewer bits => strictly worse
