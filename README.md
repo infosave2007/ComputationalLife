@@ -6,138 +6,182 @@
 
 🇷🇺 Русская версия: [README.ru.md](README.ru.md)
 
-**One idea, made rigorous:** self-reproduction, self-observation, and self-modification
-are not metaphors — they are classical theorems, and together with universal
-computation and universal prediction they form a single **computational theory of life
-and mind**. Every headline claim here is *implemented, run, self-verified by assertions,
-and covered by an independent test*. No physics is used or needed; the one honest contact
-point with NVG physics is a *boundary* (resource ceilings), documented in
-[`NVG_INTERFACE.md`](NVG_INTERFACE.md). Each claim maps to the exact function and test
-that backs it in [`CLAIMS.md`](CLAIMS.md).
+**A runnable, self-checking answer to one question: what does it actually take — in provable
+math, not hand-waving — for something to copy itself, know itself, and change itself?** These
+are the core tricks we associate with life and mind. This project shows each one is an old,
+exact theorem, and turns it into a tiny program you can run and verify in seconds.
 
-## The unifying picture
+## The problem it solves
 
-| Layer | Who | What | Module |
-|---|---|---|---|
-| self-reproduction | **von Neumann** (1948) | constructor + dual-use description tape | [`replication`](complife/replication.py) |
-| universal computation | **Turing** (1936) | one machine computes everything computable | (substrate) |
-| self-reference | **Kleene** recursion thm | a program can read *and rewrite* its own code | [`self_reference`](complife/self_reference.py) |
-| self-observation | **Conant–Ashby** (1970) | a good regulator must *model* its system | [`self_model`](complife/self_model.py) |
-| prediction = compression | **Solomonoff / Hutter** | the best model is the shortest program | [`self_model`](complife/self_model.py), [`physical_limits`](complife/physical_limits.py) |
+Big claims about life, mind, "self-awareness," "compression is intelligence," "the universe is a
+computer" are everywhere — and almost all of them are vague, untestable, or overhyped. You can't
+tell a **proof** from a **poem**.
 
-The recurring architecture is **"a cheap program + a powerful shared decoder"**:
-complexity lives in the decoder and the inputs, not in the program. That is what a data
-compressor is (model + coder), what a genome is (recipe + physics/chemistry), and what an
-agent's self-model is (a compressed predictor of itself).
+This repository fixes that for a specific, important cluster of those claims: it converts each one
+into a small program that **either passes or fails when you run it**. Philosophy you can execute.
+Concretely, it gives checkable answers to questions people usually only argue about:
 
-## The four modules
+- **Can a program really copy itself — or rewrite itself?** Yes. Here's a 75-character program
+  that prints itself, and one that edits itself.
+- **Can you ever fully predict yourself?** No — and there's an exact floor on how much of yourself
+  must stay unpredictable. (Surprisingly, this is the *same* law as "to control something, you must
+  model it.")
+- **Why can't a self-copying thing carry unlimited information?** Because copying with too many
+  errors destroys the message — a hard threshold. It's why viruses can't have huge genomes.
+- **What are the physical limits of any computer, and how close is a brain to them?** Astonishingly
+  far — a brain uses about a trillionth of a trillionth of its storage ceiling.
 
-### `self_reference` — self-reference is real, *general*, and cheap
-- A verified Python **quine** (stdout == source, byte-for-byte): **75 bytes**; plus verified
-  toy-language quines (**Underload `(:aSS):aSS`**, 10 symbols; minimal-Lisp λ-quine, 99 bytes).
-- The **second recursion theorem, constructively**: programs whose output is a *nontrivial
-  function of their own source* — `sha256`, `length`, `reverse`, `upper` — each verified in a
-  subprocess. Plus a **self-modifying** program that emits a copy of itself with an incremented
-  counter and every other byte invariant. This is the "read *and rewrite* its own code" claim,
-  now demonstrated rather than asserted.
-- **Additive-constant overhead, two honest ways:** the repr-inlining construction has overhead
-  measured to be exactly **159 + (#escaped chars)** — i.e. `O(#escapes)`, constant only for
-  escape-free payloads; a **content-agnostic** construction (payload + fixed self-reading tail)
-  has overhead **exactly constant (76 bytes)** for *arbitrary* payload bytes, including
-  quotes/backslashes/newlines/random bytes.
+And, just as important, it draws a **hard line between what's proven and what's speculation** (the
+one place it touches exotic physics is fenced off and labeled, not smuggled in as fact).
 
-### `self_model` — a self-model *must* be a lossy compression
-- Exact self-inclusive modeling is **impossible** (`2^{b_M} < |T|` whenever the target contains
-  the model plus anything else) — verified across 5 regimes.
-- The self-unpredictability floor **`H(T|M) ≥ H(T) − b_M`** is demonstrated for an **arbitrary
-  deterministic model `g`** (random hashing into `2^{b_M}` buckets), not merely the best-case
-  prefix model — the bound reduces to `I(T;M) = H(M) ≤ b_M`, which we measure directly, with
-  **bootstrap confidence intervals** and across **uniform, Zipf, and Markov** sources. A
-  capacity-wasting `g` sits strictly above the floor (a genuine lower bound).
-- The **Conant–Ashby good-regulator theorem is demonstrated**, not just cited: brute force over
-  all deterministic policies shows the optimal regulator of `Z = (D+R) mod n` is *forced* to be
-  a model `ρ(D) = (c − D) mod n` (unique up to the goal constant), and a `b`-bit regulator has
-  residual variety **`H(Z) = H(D) − b`** — the exact analogue of the self-model floor.
+## Why it exists
 
-### `replication` — small self-developing copies, with a limit
-- **Dual-use tape:** an organism = machinery + tape, used two ways — *interpreted* to build the
-  machinery, *copied verbatim* to the offspring. `child == parent` (byte-identical),
-  `grandchild == child` (the child self-boots from its own bytes), a payload mutation is
-  **inherited verbatim**; the parent→child map is a payload-length-independent `O(1)` operator.
-- **Eigen error threshold, three ways:** the 2-compartment closed form; the **full quasispecies
-  distribution** as the Perron–Frobenius eigenvector of the exact Hamming-class-lumped
-  mutation–selection matrix `W = Q·diag(f)` — **validated against brute-force `2^L` enumeration
-  to `~10⁻¹⁶`**; and an exact finite-population Wright–Fisher run. All agree that
-  **`μ_crit·L → ln σ`** (approached *from below* as `L` grows). Honestly: with back-mutation the
-  master fraction is *smooth* and strictly positive at finite `L` — the sharp catastrophe is the
-  `L → ∞` limit.
+Two reasons. First, to give **one honest, unified, tested foundation** for "life and mind as
+computation" — instead of the usual scattered arm-waving, a single picture where self-reproduction,
+self-modeling, self-reference, prediction, and physical limits are all the *same* idea, each proven.
+Second, as a **reality check and teaching tool**: a place where grand claims about minds and
+machines get grounded or rejected, with code anyone can rerun.
 
-### `physical_limits` — the only place physics enters
-- **Storage:** Landauer `kB·T·ln2` = **2.87×10⁻²¹ J** at 300 K; a brain uses **~10⁻²⁷·⁶** of its
-  Bekenstein ceiling — life is information-*sparse* (shown across E. coli → datacenter rack).
-- **Speed (now computed, not just cited):** Margolus–Levitin `4E/h` ≈ **7.6×10⁵⁰ ops/s** for a
-  brain; Bremermann `c²/h` ≈ **1.36×10⁵⁰ ops/s/kg**; Lloyd's ultimate laptop **5.4×10⁵⁰ ops/s**.
-- **Throughput:** at the brain's ~20 W / 310 K budget, Landauer allows **6.7×10²¹** irreversible
-  erasures/s — the brain runs ~7 orders of magnitude *above* the per-bit thermodynamic minimum
-  (sparse in bits, profligate in energy/bit).
-- **NVG interface (model-dependent, clearly flagged):** with the NVG *inputs* `M_Ω = 859 MeV`
-  and "the vacuum melts at `ρ_c = M_Ω⁴/(ℏc)³` = 1.26×10²⁰ kg/m³", the extremal regular core has
-  inner de Sitter scale `l = 1.128 km` and — the corrected geometry — an extremal horizon at
-  `r_h = √3·l = 1.954 km` whose Bekenstein–Hawking entropy is **6.6×10⁷⁶ bits** (the inner-scale
-  area bound `S(l) = 2.2×10⁷⁶` is a *different* quantity). Physics caps the container; it does
-  not supply the computation.
+It is **not** a product or a practical utility. Its output is understanding you can trust.
 
-## Install & run
+## The one idea behind all of it
+
+Look closely at anything alive or intelligent and you keep seeing the **same design**: a small set
+of instructions plus a powerful machine that unfolds them.
+
+- A **zip file** is a few kilobytes + an unzipper that rebuilds the whole thing.
+- A **genome** is a recipe + the chemistry that grows it into an animal.
+- Your **sense of self** is a compressed little model + a brain that runs it.
+
+The recipe is cheap; the power lives in the decoder. This project makes that idea exact — and
+shows where each version of it **hits a wall it can never cross**.
+
+## The four parts
+
+Each starts in plain words; the precise math is tucked into a "for the curious" box.
+
+### 1. A thing can refer to itself — [`self_reference`](complife/self_reference.py)
+
+**In plain words:** A program can print its own source code exactly — a "quine," like a sentence
+that perfectly describes itself (smallest here: **75 characters**). It can go further: compute
+*anything about itself* and even **rewrite itself** — the math behind self-copying code and
+reflection. The catch: a system can point at itself forever but can **never fully "understand"
+itself** (Gödel's limit).
+
+<details><summary>The precise version (for the curious)</summary>
+
+**Kleene's recursion theorem.** Self-reference exists in every general-purpose language, and adding
+"also reproduce yourself" to any program costs only a fixed number of bytes (shown exactly: a
+constant 76-byte overhead for arbitrary content). We also build the **second recursion theorem**
+constructively — programs whose output is the `sha256`, length, reverse, or uppercase of *their own
+source* — plus a self-editing program (a counter that counts up while every other byte stays put).
+Self-reference is purely *syntactic*: it adds no computing power and runs into Gödel / Tarski / Rice.
+</details>
+
+### 2. You can never fully predict yourself — [`self_model`](complife/self_model.py)
+
+**In plain words:** If your model of the world must include a model of *you*, you can never predict
+yourself perfectly — there's an unavoidable floor of "self-surprise," and the smaller your memory
+budget, the bigger it is. The twist: the rule *"to control something well, you must model it"* turns
+out to be the **exact same inequality**. Steering and self-knowing are one law.
+
+<details><summary>The precise version (for the curious)</summary>
+
+An exact self-including model is impossible (`b` bits name at most `2^b` states; the world holding
+the model has more). The residual obeys `H(T|M) ≥ H(T) − b`, shown here for an **arbitrary** model
+(not a convenient one), with confidence intervals, across uniform/Zipf/Markov data. The
+**Conant–Ashby good-regulator theorem** is *demonstrated*, not cited: brute-forcing every controller
+shows the optimal one is forced to be a model of what it controls, with residual disorder exactly
+`H(D) − b` — the same floor.
+</details>
+
+### 3. Copying yourself works — but only up to a limit — [`replication`](complife/replication.py)
+
+**In plain words:** We build a tiny "organism" — a machine plus a tape used two ways: *read* to
+build the machine, and *copied* untouched to the offspring. It reproduces byte-for-byte and passes
+on mutations. That's von Neumann's 1948 blueprint for self-reproduction — before DNA was understood.
+But there's a hard limit (Eigen's): copy with **too many errors** and the message dissolves into
+noise. It's *why viruses can't have huge genomes* — and why some antiviral drugs work by pushing a
+virus's copy-error rate just past the cliff.
+
+<details><summary>The precise version (for the curious)</summary>
+
+Part A: a working von Neumann dual-use-tape replicator (`child == parent` byte-identical, the child
+self-boots from its own bytes, mutations inherit). Part B: **Eigen's error threshold** — the fittest
+sequence survives only while `μ·L < ln σ` — computed three ways (closed form; the full quasispecies
+distribution as the leading eigenvector of the exact mutation–selection matrix, checked against
+brute force to ~10⁻¹⁶; and a finite-population simulation), all agreeing.
+</details>
+
+### 4. Physics sets the ceilings — [`physical_limits`](complife/physical_limits.py)
+
+**In plain words:** Physics caps any computer — how much it can store, how fast it can run, the least
+energy a bit can cost. The surprise: a brain uses a **staggeringly tiny slice** of these ceilings.
+Life isn't packed to the physical brim — it's astonishingly sparse. This is also the one place the
+project touches a speculative physics idea, and it's careful to mark that part as a *boundary*, not a
+mechanism.
+
+<details><summary>The precise version (for the curious)</summary>
+
+Landauer (a bit costs ≥ `kT·ln2` = 2.87×10⁻²¹ J at 300 K), Bekenstein & holographic storage bounds,
+and computed **speed ceilings** (Margolus–Levitin ≈ 7.6×10⁵⁰ ops/s for a brain, Bremermann, Lloyd).
+The brain sits ~10⁻²⁷ of its storage ceiling and ~10⁻³⁶ below its speed ceiling, yet burns ~10⁶–10⁷×
+the Landauer minimum per operation. The speculative NVG section is explicitly model-dependent —
+[`NVG_INTERFACE.md`](NVG_INTERFACE.md).
+</details>
+
+## Where this is actually useful
+
+It's a foundations project, but several results connect to real things:
+
+- **Learning & reference** — a runnable, honest tour of self-reference, prediction limits, heredity,
+  and the physics of computation, with each claim tied to a test in [`CLAIMS.md`](CLAIMS.md).
+- **A reality check** on grand claims about minds, compression, and "digital physics" — a template
+  for separating what's proven from what's marketing.
+- **Real-world hooks:** Eigen's threshold is the theory behind *lethal-mutagenesis antivirals*; the
+  self-prediction floor bounds *introspective / self-monitoring AI*; Landauer and the speed limits
+  frame *the energy cost of computation* (timely for AI datacenters); the good-regulator law is a
+  *controller-sizing* rule.
+
+## Try it yourself
 
 ```bash
-pip install -e .            # or: pip install -r requirements.txt
-python -m complife          # run all four modules, print a master PASS/FAIL summary
-python -m complife 01 03    # run only the named modules
+pip install -e .        # only needs Python 3.9+ and numpy
+python -m complife      # runs all four parts and prints PASS/FAIL for each
 ```
 
-The four numbered scripts still work from the repo root and forward to the package:
+Each part narrates what it's doing and checks itself as it goes. Run just one with
+`python -m complife 03`; the original numbered scripts still work too
+(`python3 01_self_reference_quine.py`).
+
+## Honesty first
+
+Taking it seriously means being clear about what it does **not** claim:
+
+- Every headline statement is backed by a test — [`CLAIMS.md`](CLAIMS.md) maps each claim to the
+  function and test that proves it. `make test` runs all 51 in ~8 seconds.
+- **It does not explain consciousness.** "A self-modeling, self-editing program = self-awareness" is
+  an unproven philosophical leap, and this project refuses to make it.
+- **It invents no new physics and beats no known limit.** Classic information theory + cybernetics
+  (Kleene, Conant–Ashby, von Neumann, Eigen, Shannon, Solomonoff/Hutter). The one exotic-physics link
+  (NVG) is a clearly-labeled *boundary*, never a mechanism — [`NVG_INTERFACE.md`](NVG_INTERFACE.md).
+
+## For developers
 
 ```bash
-python3 01_self_reference_quine.py   #  ==  python -m complife.self_reference
-```
-
-## Test
-
-```bash
-make test        # full suite (subprocess quines + Monte-Carlo), ~8 s
-make test-fast   # skip the slow Monte-Carlo / subprocess tests
-make cov         # coverage report
+make test        # full suite (fast unit tests + slower Monte-Carlo / subprocess checks)
+make test-fast   # skip the slow ones
 make lint        # ruff
 ```
 
-Every scientific claim above is an independent `pytest` test (see [`CLAIMS.md`](CLAIMS.md)), not
-just an in-demo assertion. Headline numbers are snapshotted to [`results/`](results/) on each run.
-
-## Project layout
-
 ```
-complife/            importable, tested package
-  common.py          entropy estimators, bootstrap CIs, constants, reporting
-  self_reference.py  quines, 2nd recursion theorem, additive-constant overhead
-  self_model.py      DPI floor for arbitrary g, sources, Conant–Ashby regulator
-  replication.py     dual-use tape, full Eigen quasispecies eigenvector, WF
-  physical_limits.py storage/speed/throughput ceilings, NVG geometry
-  __main__.py        `python -m complife`
-tests/               one file per module + common + smoke + snapshots (51 tests)
-01..04_*.py          thin runnable shims (preserve the original entry points)
-CLAIMS.md            every claim -> function -> test -> caveat
-NVG_INTERFACE.md     the one honest physics boundary (and the category errors)
+complife/            the tested package
+  self_reference.py  quines, the recursion theorem, self-editing programs
+  self_model.py      the self-prediction floor, the good-regulator theorem
+  replication.py     the self-copying organism, Eigen's error threshold
+  physical_limits.py storage / speed / energy ceilings
+tests/               one test file per part (51 tests total)
+CLAIMS.md            every claim -> the function -> the test that proves it
 ```
 
-Standard library + **numpy**. Deterministic (stochastic parts use fixed seeds).
-
-## Honesty notes
-
-- This is standard **algorithmic information theory + cybernetics** (Kleene, Conant–Ashby,
-  von Neumann, Eigen, Solomonoff/Hutter). Nothing here beats Shannon; nothing here needs new physics.
-- **Consciousness is *not* derived here.** "A self-modifying, self-observing program = self-awareness"
-  is the unproven hard-problem bridge (Chalmers); self-reference is *necessary-ish* for self-modeling
-  but is syntactic — it does not, by any proof, entail phenomenal experience.
-- The relationship to NVG physics is a **boundary, not a merger** — see [`NVG_INTERFACE.md`](NVG_INTERFACE.md).
-  The NVG numbers rest on asserted model inputs (the 859 MeV scale, the melting mechanism) and are
-  labeled as such; the Landauer/Bekenstein/holographic/speed ceilings are first-principles.
+Standard library + numpy. Fully deterministic (fixed seeds), MIT-licensed.
