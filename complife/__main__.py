@@ -14,6 +14,7 @@ from typing import Callable
 
 from . import (
     induction,
+    lethal_mutagenesis,
     physical_limits,
     quantum,
     replication,
@@ -29,6 +30,7 @@ MODULES: dict[str, Callable[[], bool]] = {
     "04": physical_limits.demo,
     "05": quantum.demo,
     "06": induction.demo,
+    "07": lethal_mutagenesis.demo,   # a practical application of module 03
 }
 
 

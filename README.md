@@ -139,7 +139,8 @@ It's a foundations project, but several results connect to real things:
 - **A reality check** on grand claims about minds, compression, and "digital physics" — a template
   for separating what's proven from what's marketing.
 - **Real-world hooks:**
-  - Eigen's threshold is the theory behind *lethal-mutagenesis antivirals*.
+  - Eigen's threshold is the theory behind *lethal-mutagenesis antivirals* — turned into a working
+    calculator in [`lethal_mutagenesis`](complife/lethal_mutagenesis.py) (`python -m complife 07`).
   - The self-prediction floor bounds *introspective / self-monitoring AI*.
   - Landauer and the speed limits frame *the energy cost of computation* (timely for AI datacenters).
   - The good-regulator law is a *controller-sizing* rule.

@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.3.2 — a practical tool: the lethal-mutagenesis calculator
+
+- **`lethal_mutagenesis`** (module 07) turns Eigen's error threshold (module 03) into a working
+  antiviral-strategy calculator: given a virus's genome length, fitness and error rate, it computes
+  how close it sits to the error catastrophe and the **fold increase in mutation rate a mutagen
+  must deliver to tip it over**. The real result: non-proofreading RNA viruses (polio, influenza,
+  HIV) sit within ~1.3–3.4× of the cliff (why ribavirin-style lethal mutagenesis works), while a
+  proofreading coronavirus is ~33× away (why you must defeat proofreading, as molnupiravir does).
+  It also flags the clinical caveat from survival-of-the-flattest: sub-lethal dosing can select for
+  robust variants instead of killing the virus. 81 tests.
+
 ## 0.3.1 — the energy of replication
 
 - **`physical_limits`** now computes the **Landauer floor to copy a genome** and bridges it to

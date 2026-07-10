@@ -8,6 +8,7 @@ import pytest
 
 from complife import (
     induction,
+    lethal_mutagenesis,
     physical_limits,
     quantum,
     replication,
@@ -24,8 +25,9 @@ from complife import (
     physical_limits.demo,
     quantum.demo,
     induction.demo,
+    lethal_mutagenesis.demo,
 ], ids=["self_reference", "self_model", "replication", "physical_limits",
-        "quantum", "induction"])
+        "quantum", "induction", "lethal_mutagenesis"])
 def test_demo_all_checks_pass(demo, capsys):
     ok = demo()
     captured = capsys.readouterr()
