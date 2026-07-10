@@ -3,9 +3,10 @@
 
 What is actually DEMONSTRATED here (each verified by running it):
   1. A real Python quine (stdout == source bytes), 75 bytes.
-  2. Quine INSTANCES in three toy languages implemented from scratch
-     (Brainfuck interpreter check, Underload 10-symbol quine, minimal-Lisp
-     lambda quine). Universal existence in every Turing-complete language is
+  2. Quine INSTANCES in four toy languages implemented from scratch (a
+     constructed & verified Brainfuck quine, Underload's 10-symbol quine, a
+     minimal-Lisp lambda quine, plus a Brainfuck interpreter check via
+     Hello-World). Universal existence in every Turing-complete language is
      Kleene's theorem; we exhibit instances.
   3. The SECOND recursion theorem constructively: programs whose output is a
      nontrivial function g(own_source) for g in {sha256, length, reverse,
@@ -118,6 +119,25 @@ BF_HELLO = ("++++++++[>++++[>++>+++>+++>+<<<<-]>+>+>->>+[<]<-]>>."
 def verify_brainfuck() -> tuple[int, bool]:
     out = run_bf(BF_HELLO)
     return len(BF_HELLO), out == b"Hello World!\n"
+
+
+def brainfuck_quine() -> str:
+    """A CONSTRUCTED (non-minimal) Brainfuck quine for this interpreter's
+    conventions (8-bit wrapping cells, unbounded tape). Layout: one code byte per
+    every third tape cell; a fixed engine regenerates the '+'-run data prefix and
+    then prints the code. Built from a generator so it is transparent and
+    genuinely verified (`run_bf(q) == q`), not a remembered string of bytes."""
+    dup, restore = "[->+>+<<]", ">>[-<<+>>]"          # duplicate/restore a cell
+    body = dup + restore + "+" * 43 + "<[>.<-]" + ">" + "+" * 19 + "..." + "[-]>"
+    code = "<<<[<<<]>>>" + "[" + body + "]" + "<<<[<<<]>>>" + "[.>>>]"
+    data = "".join("+" * ord(c) + ">>>" for c in code)
+    return data + code
+
+
+def verify_brainfuck_quine() -> tuple[int, bool]:
+    q = brainfuck_quine()
+    out = run_bf(q, max_steps=100_000_000).decode("latin1")
+    return len(q), out == q
 
 
 # =========================================================================== #
@@ -449,9 +469,11 @@ def demo() -> bool:
     report.check(f"Python quine reproduces exactly ({py_len} bytes)", py_ok)
     print(f"      {PY_QUINE}")
 
-    print("\n[2] Quine instances in three toy languages (each run & verified)")
+    print("\n[2] Quine instances in four toy languages (each run & verified)")
     bf_len, bf_ok = verify_brainfuck()
     report.check(f"Brainfuck interpreter correct via Hello-World ({bf_len}-byte prog)", bf_ok)
+    bfq_len, bfq_ok = verify_brainfuck_quine()
+    report.check(f"Brainfuck QUINE reproduces itself ({bfq_len} bytes, constructed & verified)", bfq_ok)
     ul_len, ul_ok = verify_underload()
     report.check(f"Underload quine reproduces ({ul_len} symbols): {UNDERLOAD_QUINE}", ul_ok)
     lisp_len, lisp_ok = verify_lisp()

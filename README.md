@@ -167,8 +167,6 @@ Being a serious project also means naming the edges:
 - **`induction` uses a small, explicit hypothesis class.** True Solomonoff induction is
   uncomputable, so the shortest-program search is an honest approximation — exactly what real
   compressors do — not the ideal.
-- **The Brainfuck quine is cited, not run.** The interpreter is verified via Hello-World; a
-  published BF quine matching its exact cell/EOF convention is future work.
 - **The NVG section is model-dependent by construction.** `ρ_c` and `M_crit` rest on asserted
   inputs (the 859 MeV scale, the melt mechanism); only their internal geometric consistency is
   tested — never treated as first-principles predictions. See [`NVG_INTERFACE.md`](NVG_INTERFACE.md).

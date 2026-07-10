@@ -9,8 +9,13 @@
   copy fidelity `μ ~ 1e-9` caps the stable genome at ~10⁹ bp, right at real genome scale. This
   closes the "replication models information, not energy" limitation while keeping modules 1–3
   physics-free (the energy lives in module 04, where physics belongs).
-- CI now reports the 15 slowest tests (`pytest --durations=15`) to catch performance regressions,
-  in addition to the Python 3.9/3.11/3.12 × numpy 1.x/2.x matrix already added in 0.3.0.
+- **A verified Brainfuck quine** (`brainfuck_quine`): closes the last deferred item. A constructed,
+  non-minimal 7377-byte quine, generated for this interpreter's conventions and checked
+  `run_bf(q) == q` at runtime — a genuine fourth-substrate quine, not a remembered byte-string.
+- **Performance timeline**: `benchmarks/run_benchmarks.py` plus a CI job that stores results on
+  `gh-pages` (chart at `https://<owner>.github.io/<repo>/dev/bench/`) and alerts on a >150%
+  regression. CI also reports the 15 slowest tests (`pytest --durations=15`), on top of the
+  Python 3.9/3.11/3.12 × numpy 1.x/2.x matrix from 0.3.0.
 - Note: the "NVG numerical-consistency test" is **already present** since 0.3.0 (`nvg_core` computes
   ρ_c and M_crit from M_Ω = 859 MeV; `test_nvg_core_geometry_consistent` checks the internal
   geometry). What is deliberately *not* done is testing them as first-principles *predictions* —

@@ -22,6 +22,12 @@ def test_brainfuck_hello_world():
     assert sr.run_bf(sr.BF_HELLO) == b"Hello World!\n"
 
 
+@pytest.mark.slow
+def test_brainfuck_quine_reproduces_itself():
+    n, ok = sr.verify_brainfuck_quine()
+    assert ok and n > 0
+
+
 def test_repr_overhead_is_159_plus_escapes():
     for row in sr.characterise_repr_overhead():
         assert row["overhead"] == 159 + row["escapes"]
