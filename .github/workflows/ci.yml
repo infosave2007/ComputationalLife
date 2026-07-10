@@ -36,7 +36,7 @@ jobs:
         run: ruff check complife tests
 
       - name: Test
-        run: pytest --cov=complife --cov-report=term-missing
+        run: pytest --cov=complife --cov-report=term-missing --durations=15
 
   # Guarantees the headline claim of the repo: every module runs green and every
   # assertion (the "adversarial verification") passes on a clean checkout.

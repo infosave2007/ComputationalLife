@@ -50,6 +50,7 @@ false — that is the point. Run `make test` to check them all.
 | Landauer throughput at 20 W / 310 K ≈ 6.7×10²¹ erasures/s | `landauer_max_erasures_per_s` | `test_landauer_throughput_and_floor_inverse` | brain runs ~7 orders above the per-bit minimum |
 | NVG core: `r_h = √3·l`, `S_BH = 3·S(l)`, density loop closes, `M_crit ≈ 0.99 M⊙` | `nvg_core` | `test_nvg_core_geometry_consistent` | `M_Ω = 859 MeV` and the melt mechanism are **NVG model inputs**, not derived; below `M_crit` there is no horizon, so core entropy is model-dependent |
 | LLM inference runs ~10⁸× above the Landauer floor (~7.5 nJ/token) | `llm_landauer_floor_per_token`, `gpu_max_bit_erasures_per_s` | `test_llm_inference_far_above_landauer_floor` | I_used/energy figures are order-of-magnitude; conclusion (many orders above the floor) is robust |
+| DNA replication is ~10–100× above the Landauer floor (near-optimal); Eigen fidelity caps genome size at ~10⁹ bp | `landauer_copy_energy`, `eigen_max_genome_bits` | `test_dna_replication_near_landauer_floor`, `test_eigen_max_genome_is_genome_scale` | the energy bridge from module 03; per-bp cost figures are order-of-magnitude |
 
 ## `self_model` — regulation, multi-agent & model compression (additions)
 

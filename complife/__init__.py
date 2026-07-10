@@ -20,7 +20,7 @@ Everything is substrate-independent information theory and cybernetics; physics
 enters only as ceilings on the hardware (module 4).
 """
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 __all__ = [
     "self_reference",

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "complife"
-version = "0.3.0"
+version = "0.3.1"
 description = "A computational theory of life and mind: self-reference, self-modeling, self-replication and physical limits, each implemented and adversarially verified."
 readme = "README.md"
 requires-python = ">=3.9"

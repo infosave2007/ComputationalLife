@@ -64,3 +64,18 @@ def test_llm_inference_far_above_landauer_floor():
 
 def test_gpu_erasure_ceiling_positive():
     assert pl.gpu_max_bit_erasures_per_s(700.0) > 1e22
+
+
+def test_dna_replication_near_landauer_floor():
+    # E. coli genome copy: near-optimal (~10-100x the floor), unlike computation.
+    genome_bits = 4.6e6 * 2.0
+    floor = pl.landauer_copy_energy(genome_bits)
+    assert floor == pytest.approx(2.73e-14, rel=0.1)
+    real_dna = 4.6e6 * 1.0e-19
+    assert 1.0 < real_dna / floor < 1000.0
+
+
+def test_eigen_max_genome_is_genome_scale():
+    # copy fidelity mu ~ 1e-9 caps the stable genome at ~1e9 bp (real range).
+    bits = pl.eigen_max_genome_bits(1e-9)
+    assert 1e8 < bits / 2 < 1e10

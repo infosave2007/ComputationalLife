@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.3.1 — the energy of replication
+
+- **`physical_limits`** now computes the **Landauer floor to copy a genome** and bridges it to
+  Eigen's error threshold (`landauer_copy_energy`, `eigen_max_genome_bits`). The striking result:
+  DNA replication runs only **~10–100× above the thermodynamic minimum** (near-optimal), versus
+  ~10⁶–10⁸× for brain compute and LLM inference — copying is cheap, thinking is expensive. And
+  copy fidelity `μ ~ 1e-9` caps the stable genome at ~10⁹ bp, right at real genome scale. This
+  closes the "replication models information, not energy" limitation while keeping modules 1–3
+  physics-free (the energy lives in module 04, where physics belongs).
+- CI now reports the 15 slowest tests (`pytest --durations=15`) to catch performance regressions,
+  in addition to the Python 3.9/3.11/3.12 × numpy 1.x/2.x matrix already added in 0.3.0.
+- Note: the "NVG numerical-consistency test" is **already present** since 0.3.0 (`nvg_core` computes
+  ρ_c and M_crit from M_Ω = 859 MeV; `test_nvg_core_geometry_consistent` checks the internal
+  geometry). What is deliberately *not* done is testing them as first-principles *predictions* —
+  they are asserted model inputs; see `NVG_INTERFACE.md`.
+
 ## 0.3.0 — two new walls, two extended bridges
 
 Extended the project beyond the original four modules, keeping the "proven, not

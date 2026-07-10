@@ -81,6 +81,21 @@ def gpu_max_bit_erasures_per_s(power: float, T: float = 350.0) -> float:
     return power / (KB * T * LN2)
 
 
+def landauer_copy_energy(bits: float, T: float = 310.0) -> float:
+    """Minimum energy to write one faithful irreversible copy of `bits` bits at
+    body temperature T (default 310 K). This is the thermodynamic floor for
+    replication — the physics bridge to module 03's information-only replicator."""
+    return bits * KB * T * LN2
+
+
+def eigen_max_genome_bits(mu: float, sigma: float = math.e,
+                          bits_per_symbol: float = 2.0) -> float:
+    """Max stably-heritable information (bits) at per-symbol copy-error rate `mu`,
+    from Eigen's threshold L < ln(sigma)/mu (module 03). Copy fidelity caps how
+    much a replicator can carry — and therefore its per-copy energy floor."""
+    return (math.log(sigma) / mu) * bits_per_symbol
+
+
 def llm_landauer_floor_per_token(params: float, bits_per_flop: float = 16.0,
                                  T: float = 350.0) -> float:
     """Landauer floor energy (J) for one generated token of a dense P-parameter
@@ -246,8 +261,31 @@ def demo() -> bool:
     report.check("LLM inference sits >=1e6x above the Landauer floor",
                  ratio > 1e6)
 
-    # 7. NVG interface ------------------------------------------------------
-    print("\n7. NVG INTERFACE (model input: M_Omega = 859 MeV, vacuum 'melts' at rho_c):")
+    # 7. Energy of replication (bridge to module 03) ------------------------
+    print("\n7. ENERGY OF REPLICATION (the physics bridge to module 03's replicator):")
+    genome_bp = 4.6e6                      # E. coli genome, base pairs
+    genome_bits = genome_bp * 2.0          # 2 bits / base pair
+    floor = landauer_copy_energy(genome_bits)
+    real_dna = genome_bp * 1.0e-19         # ~1e-19 J/bp (a few ATP/nucleotide)
+    dna_ratio = real_dna / floor
+    print(f"     E. coli genome: {genome_bp:.1e} bp = {genome_bits:.1e} bits")
+    print(f"     Landauer floor to copy it once: {floor:.2e} J   (real DNA replication ~ {real_dna:.1e} J)")
+    print(f"     => DNA copying runs only ~{dna_ratio:.0f}x above the thermodynamic floor -- NEAR-OPTIMAL,")
+    print("        unlike brain compute (~10^6-10^7x) or LLM inference (~10^8x). Copying is cheap;")
+    print("        thinking is what's expensive.")
+    mu = 1e-9                              # proofread DNA polymerase error rate
+    l_max_bits = eigen_max_genome_bits(mu)
+    print(f"     Eigen bridge: at copy-fidelity mu~{mu:.0e}, the max stable genome is "
+          f"~{l_max_bits / 2:.1e} bp")
+    print(f"        ({l_max_bits:.1e} bits) -- right in the range of real genomes; its copy floor is "
+          f"{landauer_copy_energy(l_max_bits):.1e} J.")
+    report.check("DNA replication is within ~1000x of the Landauer floor (near-optimal)",
+                 1.0 < dna_ratio < 1000.0)
+    report.check("Eigen-max genome at mu~1e-9 is genome-scale (1e8-1e10 bp)",
+                 1e8 < l_max_bits / 2 < 1e10)
+
+    # 8. NVG interface ------------------------------------------------------
+    print("\n8. NVG INTERFACE (model input: M_Omega = 859 MeV, vacuum 'melts' at rho_c):")
     nvg = nvg_core()
     print(f"     rho_c = M_Omega^4/(hbar c)^3 = {nvg['rho_c_energy']:.3e} J/m^3 "
           f"= {nvg['rho_c_mass']:.3e} kg/m^3   [NVG INPUT, not derived here]")

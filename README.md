@@ -160,9 +160,10 @@ Taking it seriously means being clear about what it does **not** claim:
 
 Being a serious project also means naming the edges:
 
-- **`replication` models information, not energy.** The replicator and the error threshold are
-  purely informational; the *energy* cost of copying isn't modeled here (that would be the natural
-  bridge to `physical_limits`).
+- **`replication` itself stays physics-free** (that's the point — modules 1–3 are substrate-independent).
+  The *energy* of copying now lives where physics belongs: `physical_limits` computes the Landauer
+  floor per genome copy and bridges it to Eigen's threshold — and finds DNA replication runs only
+  ~10–100× above the thermodynamic minimum (near-optimal), vs ~10⁶–10⁸× for brains and LLMs.
 - **`induction` uses a small, explicit hypothesis class.** True Solomonoff induction is
   uncomputable, so the shortest-program search is an honest approximation — exactly what real
   compressors do — not the ideal.
